@@ -142,7 +142,7 @@ public class CharTrie {
 	 */
 	public CharTrie(CharFilter charFilter, TermFilter termFilter,
 			CharTrieNodeFactory nodeFactory) {
-		root = new CharTrieNodeImpl('0');
+		root = nodeFactory.createRootNode();
 		this.charFilter = charFilter;
 		this.termFilter = termFilter;
 		this.nodeFactory = nodeFactory;
@@ -460,10 +460,6 @@ public class CharTrie {
 	 * include terminus characters as well. Adding the same listener for both
 	 * character and terminus character events will result in two invocations on
 	 * the listener for terminus characters.
-	 * <p>
-	 * <strong>Optional method</strong>. Implementers of this interface must
-	 * throw an {@link UnsupportedOperationException} if this method is not
-	 * implemented.
 	 * 
 	 * @param listener
 	 *            interested when a character is added.
@@ -475,10 +471,6 @@ public class CharTrie {
 	/**
 	 * Remove the specified listener for events fired as each character is
 	 * added.
-	 * <p>
-	 * <strong>Optional method</strong>. Implementers of this interface must
-	 * throw an {@link UnsupportedOperationException} if this method is not
-	 * implemented.
 	 */
 	public void removeCharacterAddedListener(NodeAddedListener listener) {
 		listenerList.removeCharacterAddedListener(listener);
@@ -496,10 +488,6 @@ public class CharTrie {
 	 * include terminus characters as well. Adding the same listener for both
 	 * character and terminus character events will result in two invocations on
 	 * the listener for terminus characters.
-	 * <p>
-	 * <strong>Optional method</strong>. Implementers of this interface must
-	 * throw an {@link UnsupportedOperationException} if this method is not
-	 * implemented.
 	 * 
 	 * @param listener
 	 *            interested when a terminus character is added.
@@ -511,10 +499,6 @@ public class CharTrie {
 	/**
 	 * Remove the specified listener for events fired when a terminus character
 	 * is added.
-	 * <p>
-	 * <strong>Optional method</strong>. Implementers of this interface must
-	 * throw an {@link UnsupportedOperationException} if this method is not
-	 * implemented.
 	 */
 	public void removeCharacterTerminusAddedListener(NodeAddedListener listener) {
 		listenerList.removeTerminusCharacterAddedListener(listener);
@@ -532,10 +516,6 @@ public class CharTrie {
 	 * include terminus characters as well. Adding the same listener for both
 	 * character and terminus character events will result in two invocations on
 	 * the listener for terminus characters.
-	 * <p>
-	 * <strong>Optional method</strong>. Implementers of this interface must
-	 * throw an {@link UnsupportedOperationException} if this method is not
-	 * implemented.
 	 * 
 	 * @param listener
 	 *            interested when a node is added.
@@ -547,9 +527,6 @@ public class CharTrie {
 	/**
 	 * Remove the specified listener for events fired when a node is added.
 	 * <p>
-	 * <strong>Optional method</strong>. Implementers of this interface must
-	 * throw an {@link UnsupportedOperationException} if this method is not
-	 * implemented.
 	 */
 	public void removeNodeAddedListener(NodeAddedListener listener) {
 		listenerList.removeNodeAddedListener(listener);
@@ -570,10 +547,6 @@ public class CharTrie {
 	 * include terminus characters as well. Adding the same listener for both
 	 * character and terminus character events will result in two invocations on
 	 * the listener for terminus characters.
-	 * <p>
-	 * <strong>Optional method</strong>. Implementers of this interface must
-	 * throw an {@link UnsupportedOperationException} if this method is not
-	 * implemented.
 	 * 
 	 * @param listener
 	 *            interested when a terminus node is added.
@@ -585,10 +558,6 @@ public class CharTrie {
 	/**
 	 * Remove the specified listener for events fired when a terminus node is
 	 * added.
-	 * <p>
-	 * <strong>Optional method</strong>. Implementers of this interface must
-	 * throw an {@link UnsupportedOperationException} if this method is not
-	 * implemented.
 	 */
 	public void removeTerminusNodeAddedListener(NodeAddedListener listener) {
 		listenerList.removeTerminusNodeAddedListener(listener);

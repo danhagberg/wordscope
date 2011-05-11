@@ -148,7 +148,8 @@ public class CharTrieNodeImplTest {
 	/** Create new node with no children or parents */
 	@Test
 	public void createRootNode() {
-		CharTrieNode root = new CharTrieNodeImpl('0');
+		CharTrieNode root = new CharTrieNodeImpl(true);
+		assertTrue("Root node should have answered true to isRoot", root.isRoot());
 		assertEquals(null, root.getPriorSibling());
 		assertEquals(null, root.getNextSibling());
 		assertEquals(null, root.getFirstChild());

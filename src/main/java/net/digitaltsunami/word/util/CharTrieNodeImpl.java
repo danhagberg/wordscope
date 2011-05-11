@@ -17,6 +17,7 @@ public class CharTrieNodeImpl implements CharTrieTerminusNode {
 	private CharTrieNodeImpl left;
 	private CharTrieNodeImpl right;
 	private boolean terminus;
+	private final boolean root;
 
 	/**
 	 * Create new Node with the provided value.
@@ -27,6 +28,7 @@ public class CharTrieNodeImpl implements CharTrieTerminusNode {
 	private CharTrieNodeImpl(CharTrieNode parent, char value) {
 		this.parent = (CharTrieNodeImpl) parent;
 		this.value = value;
+		this.root = false;
 	}
 
 	/**
@@ -36,6 +38,17 @@ public class CharTrieNodeImpl implements CharTrieTerminusNode {
 	 */
 	protected CharTrieNodeImpl(char value) {
 		this.value = value;
+		this.root = false;
+	}
+	
+	/**
+	 * Create new root node.  This node will not contain a value.
+	 * 
+	 * @param value
+	 */
+	protected CharTrieNodeImpl(boolean rootNode) {
+		this.value = '\0';
+		this.root = rootNode;
 	}
 
 	/*
@@ -132,6 +145,16 @@ public class CharTrieNodeImpl implements CharTrieTerminusNode {
 		return terminus;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see net.digitaltsunami.util.CharTrieNode#isRoot()
+	 */
+	@Override
+	public boolean isRoot() {
+		return root;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -266,4 +289,5 @@ public class CharTrieNodeImpl implements CharTrieTerminusNode {
 		}
 
 	}
+
 }

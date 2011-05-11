@@ -37,6 +37,12 @@ public interface CharTrieNodeFactory {
 	public CharTrieNode createNode(char value);
 
 	/**
+	 * Create a new root node.  The node must respond true to {@link CharTrieNode#isRoot}.
+	 * @return the newly created root node.
+	 */
+	public CharTrieNode createRootNode();
+	
+	/**
 	 * Create a new node with the provided character value and add as a child to
 	 * the provided node. This node created should not be a terminus for the
 	 * term (i.e., should not be for the last character in the word).

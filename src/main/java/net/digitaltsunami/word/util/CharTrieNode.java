@@ -38,6 +38,13 @@ public interface CharTrieNode extends Iterable<CharTrieNode> {
 	 * @returns true if this node completes a word from root to here.
 	 */
 	public boolean isTerminus();
+	
+	/**
+	 * Returns value indicating that node is a root node.
+	 * 
+	 * @returns true if this node represents the root node of the trie.
+	 */
+	public boolean isRoot();
 
 	/**
 	 * Return the character value for this node.

@@ -15,7 +15,7 @@ public class DefaultCharTrieNodeFactoryTest {
 	@Before
 	public void setup() {
 		factory = new DefaultCharTrieNodeFactory();
-		parentNode = factory.createNode((char)0);
+		parentNode = factory.createRootNode();
 	}
 	
 
@@ -164,5 +164,10 @@ public class DefaultCharTrieNodeFactoryTest {
 		assertSame(parentNode, convertedNode.getParent().getParent());
 		assertTrue(convertedNode.isTerminus());
 		assertEquals("ab", convertedNode.getTerm());
+	}
+	@Test
+	public void testCreateRootNode() {
+		CharTrieNode rootNode = factory.createRootNode();
+		assertTrue("Factory did not create root node", rootNode.isRoot());
 	}
 }

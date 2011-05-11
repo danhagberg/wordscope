@@ -18,6 +18,14 @@ public class DefaultCharTrieNodeFactory implements CharTrieNodeFactory {
 	}
 
 	/* (non-Javadoc)
+	 * @see net.digitaltsunami.util.CharTrieNodeFactory#createRootNode()
+	 */
+	@Override
+	public CharTrieNode createRootNode() {
+		return new CharTrieNodeImpl(true);
+	}
+
+	/* (non-Javadoc)
 	 * @see net.digitaltsunami.util.CharTrieNodeFactory#addChild(net.digitaltsunami.util.CharTrieNodeInterface, char)
 	 */
 	@Override

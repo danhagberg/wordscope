@@ -526,7 +526,6 @@ public class CharTrie {
 
 	/**
 	 * Remove the specified listener for events fired when a node is added.
-	 * <p>
 	 */
 	public void removeNodeAddedListener(NodeAddedListener listener) {
 		listenerList.removeNodeAddedListener(listener);

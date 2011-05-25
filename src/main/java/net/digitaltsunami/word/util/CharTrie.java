@@ -15,7 +15,10 @@ import net.digitaltsunami.word.util.event.NodeAddedListener;
 import net.digitaltsunami.word.util.event.NodeEventListenerList;
 
 /**
+ *<strong> JAVADOCS are a WORK IN PROGRESS</strong>
+ *<p>
  * A dictionary of terms stored using a Trie structure.
+ 
  * <p>
  * case insensitive
  * <p>
@@ -300,13 +303,14 @@ public class CharTrie {
 
 		List<String> terms = new LinkedList<String>();
 		StringBuilder termBuff = new StringBuilder(lcPrefix);
-		int prefixLen = lcPrefix.length();
+		int prefixLen = lcPrefix.length(); 
 
 		/*
 		 * Starting with the last node in the prefix node as a parent node,
 		 * descend the trie looking for nodes with a terminus of true.
 		 */
-		CharTrieNode current = prefixNodes.get(prefixLen - 1);
+		prefixLen--;  // Set the prefix to the last char in the prefix.
+		CharTrieNode current = prefixNodes.get(prefixLen);
 		if (current.isTerminus()) {
 			terms.add(termBuff.toString());
 		}
@@ -374,7 +378,7 @@ public class CharTrie {
 			StringBuilder termBuff, int currentLength) {
 		currentLength++;
 		for (CharTrieNode child : current) {
-			termBuff.setLength(currentLength);
+			termBuff.setLength(currentLength); 
 			termBuff.append(child.getValue());
 			if (child.isTerminus()) {
 				terms.add(termBuff.toString());
@@ -447,6 +451,7 @@ public class CharTrie {
 	public int getWordCount() {
 		return wordCount;
 	}
+	
 
 	/**
 	 * Add a listener for events fired as each character is added.

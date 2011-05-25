@@ -66,6 +66,24 @@ public class CharTrieTest {
 		Collection<String> terms = dict.findTerms("test");
 		assertEquals(2, terms.size());
 	}
+	
+	/**
+	 * Ensure that the terms returned are the terms without any other characters within them.
+	 * Checks for both an exact term returned as well as a term returned for a prefix.
+	 */
+	@Test
+	public void testReturnedTerm() {
+		CharTrie dict = new CharTrie();
+		dict.addTerm("test");
+		Collection<String> terms = dict.findTerms("test");
+		assertEquals(1, terms.size());
+		String[] termArr = terms.toArray(new String[]{});
+		terms = dict.findTerms("te");
+		assertEquals(1, terms.size());
+		termArr = terms.toArray(new String[]{});
+		assertEquals("test", termArr[0]);
+		
+	}
 
 	/**
 	 * Test method for
@@ -431,7 +449,8 @@ public class CharTrieTest {
 		}
 
 		// Remove all terms from original set that are returned by getAllTerms.
-		terms.removeAll(dict.getAllTerms());
+		Collection<String> allTerms = dict.getAllTerms();
+		terms.removeAll(allTerms);
 
 		assertEquals(0, terms.size());
 	}

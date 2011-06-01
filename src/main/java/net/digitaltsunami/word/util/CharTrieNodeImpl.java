@@ -175,33 +175,32 @@ public class CharTrieNodeImpl implements CharTrieTerminusNode {
 		return this.parent;
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Return the left sibling for this node or null if first node.
 	 * 
-	 * @see net.digitaltsunami.util.CharTrieNode#getPriorSibling()
+	 * @return the left sibling for this node or null if first node.
 	 */
-	@Override
-	public CharTrieNode getPriorSibling() {
+	protected CharTrieNode getPriorSibling() {
 		return this.left;
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Return the right sibling for this node or null if first node.
 	 * 
-	 * @see net.digitaltsunami.util.CharTrieNode#getNextSibling()
+	 * @return the right sibling for this node or null if first node.
 	 */
-	@Override
-	public CharTrieNode getNextSibling() {
+	protected CharTrieNode getNextSibling() {
 		return this.right;
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Return the first child node for this node or null if node has no
+	 * children.
 	 * 
-	 * @see net.digitaltsunami.util.CharTrieNode#getFirstChild()
+	 * @return the first child node for this node or null if node has no
+	 *         children.
 	 */
-	@Override
-	public CharTrieNode getFirstChild() {
+	protected CharTrieNode getFirstChild() {
 		return this.firstChild;
 	}
 

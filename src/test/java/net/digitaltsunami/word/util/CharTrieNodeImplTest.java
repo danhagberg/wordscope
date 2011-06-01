@@ -64,7 +64,7 @@ public class CharTrieNodeImplTest {
 	 */
 	@Test
 	public void testGetFirstChild() {
-		CharTrieNode node = new CharTrieNodeImpl('h');
+		CharTrieNodeImpl node = new CharTrieNodeImpl('h');
 		node.addChild('i');
 		node.addChild('o');
 		node.addChild('a');
@@ -75,8 +75,8 @@ public class CharTrieNodeImplTest {
 	 */
 	@Test
 	public void testGetNextSibling() {
-		CharTrieNode node = new CharTrieNodeImpl('h');
-		CharTrieNode currentNode = node.addChild('i');
+		CharTrieNodeImpl node = new CharTrieNodeImpl('h');
+		CharTrieNodeImpl currentNode = (CharTrieNodeImpl) node.addChild('i');
 		node.addChild('o');
 		node.addChild('a');
 		assertEquals('o', currentNode.getNextSibling().getValue());
@@ -87,8 +87,8 @@ public class CharTrieNodeImplTest {
 	 */
 	@Test
 	public void testGetPriorSibling() {
-		CharTrieNode node = new CharTrieNodeImpl('h');
-		CharTrieNode currentNode = node.addChild('i');
+		CharTrieNodeImpl node = new CharTrieNodeImpl('h');
+		CharTrieNodeImpl currentNode = (CharTrieNodeImpl) node.addChild('i');
 		node.addChild('o');
 		node.addChild('a');
 		assertEquals('a', currentNode.getPriorSibling().getValue());
@@ -148,7 +148,7 @@ public class CharTrieNodeImplTest {
 	/** Create new node with no children or parents */
 	@Test
 	public void createRootNode() {
-		CharTrieNode root = new CharTrieNodeImpl(true);
+		CharTrieNodeImpl root = new CharTrieNodeImpl(true);
 		assertTrue("Root node should have answered true to isRoot", root.isRoot());
 		assertEquals(null, root.getPriorSibling());
 		assertEquals(null, root.getNextSibling());
@@ -163,8 +163,8 @@ public class CharTrieNodeImplTest {
 	 */
 	@Test
 	public void addFirstChildNodeViaAddChild() {
-		CharTrieNode root = new CharTrieNodeImpl('0');
-		CharTrieNode firstChild = root.addChild('b');
+		CharTrieNodeImpl root = new CharTrieNodeImpl('0');
+		CharTrieNodeImpl firstChild = (CharTrieNodeImpl) root.addChild('b');
 
 		assertSame(firstChild, root.getFirstChild());
 		assertEquals(null, firstChild.getPriorSibling());
@@ -180,8 +180,8 @@ public class CharTrieNodeImplTest {
 	 */
 	@Test
 	public void addDuplicateChildNodeViaAddChild() {
-		CharTrieNode root = new CharTrieNodeImpl('0');
-		CharTrieNode firstChild = root.addChild('b');
+		CharTrieNodeImpl root = new CharTrieNodeImpl('0');
+		CharTrieNodeImpl firstChild = (CharTrieNodeImpl) root.addChild('b');
 
 		assertSame(firstChild, root.getFirstChild());
 		assertEquals(null, firstChild.getPriorSibling());
@@ -205,9 +205,9 @@ public class CharTrieNodeImplTest {
 	 */
 	@Test
 	public void appendSiblingViaAdd() {
-		CharTrieNode root = new CharTrieNodeImpl('0');
-		CharTrieNode firstChild = root.addChild('b');
-		CharTrieNode sibling = root.addChild('d');
+		CharTrieNodeImpl root = new CharTrieNodeImpl('0');
+		CharTrieNodeImpl firstChild = (CharTrieNodeImpl) root.addChild('b');
+		CharTrieNodeImpl sibling = (CharTrieNodeImpl) root.addChild('d');
 
 		assertSame(firstChild, root.getFirstChild());
 		assertEquals(null, firstChild.getPriorSibling());
@@ -223,10 +223,10 @@ public class CharTrieNodeImplTest {
 	 */
 	@Test
 	public void insertSiblingViaAddChild() {
-		CharTrieNode root = new CharTrieNodeImpl('0');
-		CharTrieNode firstChild = root.addChild('b');
-		CharTrieNode lastChild = root.addChild('d');
-		CharTrieNode sibling = root.addChild('c');
+		CharTrieNodeImpl root = new CharTrieNodeImpl('0');
+		CharTrieNodeImpl firstChild = (CharTrieNodeImpl) root.addChild('b');
+		CharTrieNodeImpl lastChild = (CharTrieNodeImpl) root.addChild('d');
+		CharTrieNodeImpl sibling = (CharTrieNodeImpl) root.addChild('c');
 
 		assertEquals(null, sibling.getFirstChild());
 		assertSame(firstChild, root.getFirstChild());
@@ -248,11 +248,11 @@ public class CharTrieNodeImplTest {
 	 */
 	@Test
 	public void prependSiblingViaAdd() {
-		CharTrieNode root = new CharTrieNodeImpl('0');
+		CharTrieNodeImpl root = new CharTrieNodeImpl('0');
 
-		CharTrieNode origFirstChild = root.addChild('b');
-		CharTrieNode lastChild = root.addChild('d');
-		CharTrieNode newFirstChild = root.addChild('a');
+		CharTrieNodeImpl origFirstChild = (CharTrieNodeImpl) root.addChild('b');
+		CharTrieNodeImpl lastChild = (CharTrieNodeImpl) root.addChild('d');
+		CharTrieNodeImpl newFirstChild = (CharTrieNodeImpl) root.addChild('a');
 
 		assertSame(newFirstChild, root.getFirstChild());
 

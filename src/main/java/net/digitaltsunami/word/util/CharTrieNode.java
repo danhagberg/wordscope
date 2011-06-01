@@ -61,29 +61,6 @@ public interface CharTrieNode extends Iterable<CharTrieNode> {
 	public CharTrieNode getParent();
 
 	/**
-	 * Return the left sibling for this node or null if first node.
-	 * 
-	 * @return the left sibling for this node or null if first node.
-	 */
-	public CharTrieNode getPriorSibling();
-
-	/**
-	 * Return the right sibling for this node or null if first node.
-	 * 
-	 * @return the right sibling for this node or null if first node.
-	 */
-	public CharTrieNode getNextSibling();
-
-	/**
-	 * Return the first child node for this node or null if node has no
-	 * children.
-	 * 
-	 * @return the first child node for this node or null if node has no
-	 *         children.
-	 */
-	public CharTrieNode getFirstChild();
-
-	/**
 	 * Return an iterator over the children of this node.
 	 * 
 	 * @return an iterator over the children of this node.

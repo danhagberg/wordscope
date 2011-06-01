@@ -216,6 +216,21 @@ public class CharTrieNodeImpl implements CharTrieTerminusNode {
 		
 		CharTrieNodeImpl currNode = this;
 		while (currNode.parent != null) {
+			// This entry will exceed buffer limits: double size and copy
+			if (buffPos == 0) {
+				// Save off original values
+				int origBuffSize = buffSize;
+				char[] origBuff = buff;
+				// Double size of buffer
+				buffSize = buffSize*2;
+				buff = new char[buffSize];
+				// Copy original to new buffer
+				buffPos = buffSize - 1;
+				for (int origIdx = origBuffSize - 1; origIdx > 0; buffPos--, origIdx--) {
+					buff[buffPos] = origBuff[origIdx];
+				}
+			}
+			
 			buffPos--;
 			buff[buffPos] = currNode.value;
 			currNode = currNode.parent;
@@ -223,8 +238,8 @@ public class CharTrieNodeImpl implements CharTrieTerminusNode {
 		
 		char[] termBuff = Arrays.copyOfRange(buff, buffPos, buffSize);
 		return new String(termBuff);
-		
 	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 

@@ -58,7 +58,7 @@ public class CharTrieNodeImplTest {
 		CharTrieNode node = new CharTrieNodeImpl('a');
 		assertEquals('a', node.getValue());
 	}
-	
+
 	/**
 	 * Test getFirstChild returns appropriate node.
 	 */
@@ -70,6 +70,7 @@ public class CharTrieNodeImplTest {
 		node.addChild('a');
 		assertEquals('a', node.getFirstChild().getValue());
 	}
+
 	/**
 	 * Test getNextSibling returns appropriate node.
 	 */
@@ -93,7 +94,6 @@ public class CharTrieNodeImplTest {
 		node.addChild('a');
 		assertEquals('a', currentNode.getPriorSibling().getValue());
 	}
-
 
 	/**
 	 * Ensure {@link CharTrieNodeImpl} returns an iterator over the children of
@@ -315,11 +315,39 @@ public class CharTrieNodeImplTest {
 		// Add some single character terms
 		root.addChild('a').addChild('t').addChild('e');
 		root.addChild('c').addChild('a').addChild('b');
-		CharTrieNodeImpl testTerm = (CharTrieNodeImpl) root.addChild('c')
-				.addChild('a').addChild('n');
+		CharTrieNodeImpl testTerm = 
+			(CharTrieNodeImpl) root.addChild('c').addChild('a').addChild('n');
 		root.addChild('c').addChild('a').addChild('t');
 		testTerm.setTerminus(true);
 		assertEquals("can", testTerm.getTerm());
+	}
+
+	/**
+	 * Test that getTerm exceeding default buffer size correctly increases
+	 * buffer and does not error.
+	 */
+	@Test
+	public void testGetTermLarge() {
+		CharTrieNodeImpl root = new CharTrieNodeImpl('0');
+		CharTrieNodeImpl currentNode = root;
+		// Current initial buffer is set to 128
+		for(int i = 0; i < 127; i++) {
+			currentNode = (CharTrieNodeImpl) currentNode.addChild('a');
+		}
+		// Test that right before boundry works correctly.
+		currentNode.setTerminus(true);
+		assertEquals(127, currentNode.getTerm().length());
+		
+		// Test that right at boundry works correctly.
+		currentNode = (CharTrieNodeImpl) currentNode.addChild('b');
+		currentNode.setTerminus(true);
+		assertEquals(128, currentNode.getTerm().length());
+		
+		// Test that right past boundry works correctly.
+		currentNode = (CharTrieNodeImpl) currentNode.addChild('b');
+		currentNode.setTerminus(true);
+		assertEquals(129, currentNode.getTerm().length());
+		
 	}
 
 	/**

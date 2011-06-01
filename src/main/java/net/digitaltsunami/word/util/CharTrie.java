@@ -9,16 +9,18 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
+import java.util.Stack;
 
 import net.digitaltsunami.word.util.event.NodeAddedEvent;
 import net.digitaltsunami.word.util.event.NodeAddedListener;
 import net.digitaltsunami.word.util.event.NodeEventListenerList;
 
 /**
- *<strong> JAVADOCS are a WORK IN PROGRESS</strong>
- *<p>
+ * <strong> JAVADOCS are a WORK IN PROGRESS</strong>
+ * <p>
  * A dictionary of terms stored using a Trie structure.
- 
+ * 
  * <p>
  * case insensitive
  * <p>
@@ -58,6 +60,12 @@ import net.digitaltsunami.word.util.event.NodeEventListenerList;
  * @author dhagberg
  */
 public class CharTrie {
+	/**
+	 * Default value used to indicate a wildcard character in position within a
+	 * pattern.
+	 */
+	public static final char WILDCARD_CHAR = '~';
+
 	/** Empty node used as root of trie. */
 	private final CharTrieNode root;
 	/**
@@ -143,8 +151,7 @@ public class CharTrie {
 	 * @param termFilter
 	 * @param nodeFactory
 	 */
-	public CharTrie(CharFilter charFilter, TermFilter termFilter,
-			CharTrieNodeFactory nodeFactory) {
+	public CharTrie(CharFilter charFilter, TermFilter termFilter, CharTrieNodeFactory nodeFactory) {
 		root = nodeFactory.createRootNode();
 		this.charFilter = charFilter;
 		this.termFilter = termFilter;
@@ -212,10 +219,12 @@ public class CharTrie {
 			currentNode = node;
 		}
 		// If at end, sequence already existed but may or may not have been a
-		// term. If node already a terminus, return, otherwise convert to terminus.
+		// term. If node already a terminus, return, otherwise convert to
+		// terminus.
 		if (termPos == termLen) {
 			if (currentNode.isTerminus()) {
-				listenerList.dispatchTerminusCharacterAddedEvent((CharTrieTerminusNode) currentNode);
+				listenerList
+						.dispatchTerminusCharacterAddedEvent((CharTrieTerminusNode) currentNode);
 				return;
 			} else {
 				currentNode = nodeFactory.convertToTerminus(currentNode, originalTerm);
@@ -231,8 +240,7 @@ public class CharTrie {
 		}
 		// Mark the last node as the end of a sequence if the sequence has not
 		// previously been added.
-		currentNode = nodeFactory.addChildTerminus(currentNode, termArray[termPos],
-				originalTerm);
+		currentNode = nodeFactory.addChildTerminus(currentNode, termArray[termPos], originalTerm);
 		listenerList.dispatchTerminusNodeAddedEvent((CharTrieTerminusNode) currentNode);
 		wordCount++;
 	}
@@ -303,13 +311,13 @@ public class CharTrie {
 
 		List<String> terms = new LinkedList<String>();
 		StringBuilder termBuff = new StringBuilder(lcPrefix);
-		int prefixLen = lcPrefix.length(); 
+		int prefixLen = lcPrefix.length();
 
 		/*
 		 * Starting with the last node in the prefix node as a parent node,
 		 * descend the trie looking for nodes with a terminus of true.
 		 */
-		prefixLen--;  // Set the prefix to the last char in the prefix.
+		prefixLen--; // Set the prefix to the last char in the prefix.
 		CharTrieNode current = prefixNodes.get(prefixLen);
 		if (current.isTerminus()) {
 			terms.add(termBuff.toString());
@@ -317,6 +325,180 @@ public class CharTrie {
 		findTerms(terms, current, termBuff, prefixLen);
 
 		return terms;
+	}
+
+	/**
+	 * Find and return all terms within the dictionary matching the provided
+	 * pattern. The pattern provided is currently limited to fixed and wildcard
+	 * characters for a specific position. For example, with the default
+	 * wildcard char of ~ (tilde), a~~m will return all terms that begin with a,
+	 * end with m and are exactly four characters in length. Unlike
+	 * {@link #findTerms(String)}, this method will return only the matches and
+	 * not all terms beginning with the pattern.
+	 * <p>
+	 * The query will start at the root of the dictionary.
+	 * 
+	 * @param pattern
+	 *            Mix of fixed and/or {@link #WILDCARD_CHAR} characters to
+	 *            match.
+	 * @return A set of all terms matching the provided pattern. If no terms
+	 *         found, an empty set will be returned.
+	 * @see #WILDCARD_CHAR
+	 */
+	public Collection<String> findPattern(String pattern, boolean recursive) {
+		return recursive ? findPatternRecursive(pattern) : findPattern(pattern);
+		
+	}
+	/**
+	 * Find and return all terms within the dictionary matching the provided
+	 * pattern. The pattern provided is currently limited to fixed and wildcard
+	 * characters for a specific position. For example, with the default
+	 * wildcard char of ~ (tilde), a~~m will return all terms that begin with a,
+	 * end with m and are exactly four characters in length. Unlike
+	 * {@link #findTerms(String)}, this method will return only the matches and
+	 * not all terms beginning with the pattern.
+	 * <p>
+	 * The query will start at the root of the dictionary.
+	 * 
+	 * @param pattern
+	 *            Mix of fixed and/or {@link #WILDCARD_CHAR} characters to
+	 *            match.
+	 * @return A set of all terms matching the provided pattern. If no terms
+	 *         found, an empty set will be returned.
+	 * @see #WILDCARD_CHAR
+	 */
+	public Collection<String> findPattern(String pattern) {
+		int patLen = pattern.length();
+		if (patLen < 1) {
+			return Collections.emptyList();
+		}
+		char[] lcPattern = pattern.toLowerCase().toCharArray();
+		Collection<String> matchingTerms = new ArrayList<String>();
+
+		Queue<CharTrieNode> candidates = new LinkedList<CharTrieNode>();
+		CharTrieNode currentNode = root;
+		candidates.add(root);
+		
+		// Sentinel is used to delimit level changes.
+		CharTrieNode sentinel = nodeFactory.createNode('\0');
+		candidates.add(sentinel); 
+		
+		int patPos = 0;
+		int lastPatPos = patLen - 1;
+		while (!candidates.isEmpty()) {
+			currentNode = candidates.poll();
+			if (currentNode == sentinel) {
+				/*
+				 * All nodes at the current level have been processed. Advance
+				 * to next position and add a sentinel for the next level if not
+				 * at the end.
+				 */
+				patPos++;
+				if (patPos < patLen) {
+					candidates.add(sentinel);
+				}
+				continue;
+			}
+
+			if (patPos == lastPatPos) {
+				/*
+				 * At the end of the pattern. Check all children of current node
+				 * for match of pattern. If a match and the node indicates the
+				 * last character in a term, add to list.
+				 */
+				if (lcPattern[patPos] == WILDCARD_CHAR) {
+					for (CharTrieNode child : currentNode) {
+						if (child.isTerminus()) {
+							matchingTerms.add(((CharTrieTerminusNode) child).getTerm());
+						}
+					}
+				} else {
+					CharTrieNode child = currentNode.getChild(lcPattern[patPos]);
+					if (child != null) {
+						if (child.isTerminus()) {
+							matchingTerms.add(((CharTrieTerminusNode) child).getTerm());
+						}
+					}
+				}
+			} else {
+				/*
+				 * Examine current nodes children and add all nodes matching the
+				 * pattern to the candidates queue for subsequent processing.
+				 */
+				if (lcPattern[patPos] == WILDCARD_CHAR) {
+					for (CharTrieNode child : currentNode) {
+						candidates.add(child);
+					}
+				} else {
+					CharTrieNode child = currentNode.getChild(lcPattern[patPos]);
+					if (child != null) {
+						candidates.add(child);
+					}
+				}
+			}
+		}
+		return matchingTerms;
+	}
+
+	/**
+	 * Find and return all terms within the dictionary matching the provided
+	 * pattern. The pattern provided is currently limited to fixed and wildcard
+	 * characters for a specific position. For example, with the default
+	 * wildcard char of ~ (tilde), a~~m will return all terms that begin with a,
+	 * end with m and are exactly four characters in length. Unlike
+	 * {@link #findTerms(String)}, this method will return only the matches and
+	 * not all terms beginning with the pattern.
+	 * <p>
+	 * The query will start at the root of the dictionary.
+	 * 
+	 * @param pattern
+	 *            Mix of fixed and/or {@link #WILDCARD_CHAR} characters to
+	 *            match.
+	 * @return A set of all terms matching the provided pattern. If no terms
+	 *         found, an empty set will be returned.
+	 * @see #WILDCARD_CHAR
+	 */
+	private Collection<String> findPatternRecursive(String pattern) {
+		char[] lcPattern = pattern.toLowerCase().toCharArray();
+		CharTrieNode currentNode = root;
+		Collection<String> matchingTerms = new ArrayList<String>();
+		findPattern(matchingTerms, lcPattern, 0, currentNode);
+		return matchingTerms;
+	}
+
+	/**
+	 * Recursive method to find all terms matching the pattern provided starting
+	 * at the pattern position and node provided. Results will be stored in the
+	 * provided list.
+	 * 
+	 * @param list
+	 *            Location to store all matching results.
+	 * @param pattern
+	 *            Mix of fixed and/or {@link #WILDCARD_CHAR} characters to
+	 *            match.
+	 * @param pos
+	 *            current character position with pattern.
+	 * @param node
+	 *            current node from which the children will be compared against
+	 *            the current character in the pattern.
+	 */
+	private void findPattern(Collection<String> list, char[] pattern, int pos, CharTrieNode node) {
+		if (node == null) {
+			return;
+		}
+		if (pos == pattern.length) {
+			if (node.isTerminus()) {
+				list.add(((CharTrieTerminusNode) node).getTerm());
+			}
+			return;
+		}
+		if (pattern[pos] == WILDCARD_CHAR) {
+			for (CharTrieNode child : node) {
+				findPattern(list, pattern, pos + 1, child);
+			}
+		} else {
+			findPattern(list, pattern, pos + 1, node.getChild(pattern[pos]));
+		}
 	}
 
 	/**
@@ -352,7 +534,7 @@ public class CharTrie {
 		 * Starting with the root node as the parent node, descend the trie
 		 * looking for nodes with a terminus of true.
 		 */
-		for(CharTrieNode child : root) {
+		for (CharTrieNode child : root) {
 			StringBuilder termBuff = new StringBuilder();
 			termBuff.append(child.getValue());
 			if (child.isTerminus()) {
@@ -374,11 +556,11 @@ public class CharTrie {
 	 * @param termBuff
 	 * @param currentLength
 	 */
-	private void findTerms(Collection<String> terms, CharTrieNode current,
-			StringBuilder termBuff, int currentLength) {
+	private void findTerms(Collection<String> terms, CharTrieNode current, StringBuilder termBuff,
+			int currentLength) {
 		currentLength++;
 		for (CharTrieNode child : current) {
-			termBuff.setLength(currentLength); 
+			termBuff.setLength(currentLength);
 			termBuff.append(child.getValue());
 			if (child.isTerminus()) {
 				terms.add(termBuff.toString());
@@ -407,10 +589,8 @@ public class CharTrie {
 	 *         If an exact match is not found, then an empty list will be
 	 *         returned.
 	 */
-	protected List<CharTrieNode> findChildSequence(CharTrieNode parent,
-			String sequence) {
-		List<CharTrieNode> nodes = new ArrayList<CharTrieNode>(
-				sequence.length());
+	protected List<CharTrieNode> findChildSequence(CharTrieNode parent, String sequence) {
+		List<CharTrieNode> nodes = new ArrayList<CharTrieNode>(sequence.length());
 		for (char elem : sequence.toCharArray()) {
 			CharTrieNode node = parent.getChild(elem);
 			if (node == null) {
@@ -451,7 +631,6 @@ public class CharTrie {
 	public int getWordCount() {
 		return wordCount;
 	}
-	
 
 	/**
 	 * Add a listener for events fired as each character is added.

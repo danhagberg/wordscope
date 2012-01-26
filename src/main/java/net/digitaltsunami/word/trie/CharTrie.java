@@ -67,7 +67,8 @@ public class CharTrie {
      */
     public static final char WILDCARD_CHAR = '~';
     /**
-     * Wildcard character used in pattern searches. Defaults to {@link #WILDCARD_CHAR}.
+     * Wildcard character used in pattern searches. Defaults to
+     * {@link #WILDCARD_CHAR}.
      */
     private char wildcardChar = WILDCARD_CHAR;
 
@@ -351,8 +352,7 @@ public class CharTrie {
      * The query will start at the root of the dictionary.
      * 
      * @param pattern
-     *            Mix of fixed and/or {@link #wildcardChar} characters to
-     *            match.
+     *            Mix of fixed and/or {@link #wildcardChar} characters to match.
      * @return A set of all terms matching the provided pattern. If no terms
      *         found, an empty set will be returned.
      * @see #WILDCARD_CHAR for default wildcard value.
@@ -644,6 +644,7 @@ public class CharTrie {
 
     /**
      * Current wildcard in use for pattern queries.
+     * 
      * @return the wildcardChar
      */
     public char getWildcardChar() {
@@ -652,10 +653,82 @@ public class CharTrie {
 
     /**
      * Set the wildcard to use for pattern queries.
-     * @param wildcardChar the wildcardChar to set
+     * 
+     * @param wildcardChar
+     *            the wildcardChar to set
      */
     public void setWildcardChar(char wildcardChar) {
         this.wildcardChar = wildcardChar;
     }
 
+    /**
+     * Return all words within the dictionary with number of characters equal to
+     * the provided length.
+     * 
+     * @param length
+     *            exact size of words to be returned.
+     * @return
+     */
+    public Collection<String> findAllTermsOfLength(int length) {
+        return findAllTermsOfLength(length, length);
+    }
+
+    /**
+     * Return all words within the dictionary with number of characters within
+     * the range:
+     * <p>
+     * minLength <= termLen <= maxLength
+     * 
+     * @param minLength
+     *            minimum size of words to be returned. Must be >= 0
+     * @param maxLength
+     *            maximum size of words to be returned. Must be >= 0. If less
+     *            than minLength, will be changed to minLength.
+     * @return a collection of strings matching size constraints. If none found,
+     *         an empty collection will be returned.
+     */
+    public Collection<String> findAllTermsOfLength(int minLength, int maxLength) {
+        CharTrieNode currentNode = root;
+        minLength = Math.max(0, minLength);
+        maxLength = Math.max(minLength, maxLength);
+        Collection<String> matchingTerms = new ArrayList<String>();
+        findAllTermsOfLength(minLength, maxLength, matchingTerms, 0, currentNode);
+        return matchingTerms;
+    }
+
+    /**
+     * Recursive method to find all terms of size within the range:
+     * <p>
+     * minLength <= termLen <= maxLength
+     * <p>
+     * 
+     * Results will be stored in the provided list.
+     * 
+     * @param minLength
+     *            minimum size of words to be returned.
+     * @param maxLength
+     *            maximum size of words to be returned.
+     * @param list
+     *            Location to store all matching results.
+     * @param pos
+     *            current character position with pattern.
+     * @param node
+     *            current node from which the children will be compared against
+     *            the current character in the pattern.
+     */
+    private void findAllTermsOfLength(int minLength, int maxLength, Collection<String> list,
+            int pos,
+            CharTrieNode node) {
+        if (node == null || pos > maxLength) {
+            return;
+        }
+        if (node.isTerminus()) {
+            if (pos >= minLength) {
+                list.add(((CharTrieTerminusNode) node).getTerm());
+            }
+        }
+        for (CharTrieNode child : node) {
+            findAllTermsOfLength(minLength, maxLength, list, pos + 1, child);
+        }
+    }
 }

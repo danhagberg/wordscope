@@ -783,4 +783,171 @@ public class CharTrieTest {
         dict.addTerm("lake");
         assertEquals(1, listener.eventCount);
     }
+    
+    /**
+     * Test method for
+     * {@link net.digitaltsunami.word.trie.CharTrie#findAllTermsOfLength(int)}
+     * Test with multiple words within dictionary of tested length.
+     */
+    @Test
+    public void testAllTermsOfLength() {
+        CharTrie dict = new CharTrie();
+        dict.addTerm("flag");
+        dict.addTerm("flagrant");
+        dict.addTerm("frag");
+        dict.addTerm("fang");
+        dict.addTerm("plan");
+        dict.addTerm("epsilon");
+        dict.addTerm("trachea");
+        dict.addTerm("fa");
+        dict.addTerm("ace");
+        dict.addTerm("acid");
+        dict.addTerm("accent");
+
+        Collection<String> terms = dict.findAllTermsOfLength(4);
+        assertEquals(5, terms.size());
+
+        assertTrue(terms.contains("flag"));
+        assertTrue(terms.contains("frag"));
+        assertTrue(terms.contains("fang"));
+        assertTrue(terms.contains("plan"));
+        assertTrue(terms.contains("acid"));
+    }
+
+    /**
+     * Test method for
+     * {@link net.digitaltsunami.word.trie.CharTrie#findAllTermsOfLength(int)}
+     * Test with no words within dictionary of tested length.
+     */
+    @Test
+    public void testAllTermsOfLengthNoMatches() {
+        CharTrie dict = new CharTrie();
+        dict.addTerm("flag");
+        dict.addTerm("flagrant");
+        dict.addTerm("frag");
+        dict.addTerm("fang");
+        dict.addTerm("plan");
+        dict.addTerm("epsilon");
+        dict.addTerm("trachea");
+        dict.addTerm("fa");
+        dict.addTerm("ace");
+        dict.addTerm("acid");
+        dict.addTerm("accent");
+
+        Collection<String> terms = dict.findAllTermsOfLength(1);
+        assertEquals(0, terms.size());
+    }
+    /**
+     * Test method for
+     * {@link net.digitaltsunami.word.trie.CharTrie#findAllTermsOfLength(int, int)}
+     * Test with multiple words within dictionary of tested length.
+     */
+    @Test
+    public void testAllTermsOfLengthRange() {
+        CharTrie dict = new CharTrie();
+        dict.addTerm("flag");
+        dict.addTerm("flagrant");
+        dict.addTerm("frag");
+        dict.addTerm("fang");
+        dict.addTerm("plan");
+        dict.addTerm("epsilon");
+        dict.addTerm("trachea");
+        dict.addTerm("a");
+        dict.addTerm("fa");
+        dict.addTerm("ace");
+        dict.addTerm("acid");
+        dict.addTerm("accent");
+
+        // Test tight range
+        Collection<String> terms = dict.findAllTermsOfLength(3,4);
+        assertEquals(6, terms.size());
+
+        assertTrue(terms.contains("flag"));
+        assertTrue(terms.contains("frag"));
+        assertTrue(terms.contains("fang"));
+        assertTrue(terms.contains("plan"));
+        assertTrue(terms.contains("ace"));
+        assertTrue(terms.contains("acid"));
+        
+        // Test range of all words up to 4 in length inclusive
+        terms = dict.findAllTermsOfLength(1,4);
+        assertEquals(8, terms.size());
+
+        assertTrue(terms.contains("flag"));
+        assertTrue(terms.contains("frag"));
+        assertTrue(terms.contains("fang"));
+        assertTrue(terms.contains("plan"));
+        assertTrue(terms.contains("a"));
+        assertTrue(terms.contains("fa"));
+        assertTrue(terms.contains("ace"));
+        assertTrue(terms.contains("acid"));
+        
+        // Test range of words at the max length
+        terms = dict.findAllTermsOfLength(7,8);
+        assertEquals(3, terms.size());
+        assertTrue(terms.contains("flagrant"));
+        assertTrue(terms.contains("epsilon"));
+        assertTrue(terms.contains("trachea"));
+        
+        // Test range enclosing all word lengths
+        terms = dict.findAllTermsOfLength(1,100);
+        assertEquals(12, terms.size());
+
+    }
+
+    /**
+     * Test method for
+     * {@link net.digitaltsunami.word.trie.CharTrie#findAllTermsOfLength(int,int)}
+     * Test with no words within dictionary of tested length.
+     */
+    @Test
+    public void testAllTermsOfLengthRangeNoMatches() {
+        CharTrie dict = new CharTrie();
+        dict.addTerm("flag");
+        dict.addTerm("flagrant");
+        dict.addTerm("frag");
+        dict.addTerm("fang");
+        dict.addTerm("plan");
+        dict.addTerm("epsilon");
+        dict.addTerm("trachea");
+        dict.addTerm("ace");
+        dict.addTerm("acid");
+        dict.addTerm("accent");
+
+        // Test range smaller than min word length.
+        Collection<String> terms = dict.findAllTermsOfLength(1,2);
+        assertEquals(0, terms.size());
+        
+        // Test range greater than max word length.
+        terms = dict.findAllTermsOfLength(9,12);
+        assertEquals(0, terms.size());
+    }
+    /**
+     * Test method for
+     * {@link net.digitaltsunami.word.trie.CharTrie#findAllTermsOfLength(int,int)}
+     * Test with range values too small or out of order.
+     */
+    @Test
+    public void testAllTermsOfLengthRangeTooSmall() {
+        CharTrie dict = new CharTrie();
+        dict.addTerm("a");
+        dict.addTerm("flag");
+        dict.addTerm("flagrant");
+        dict.addTerm("frag");
+        dict.addTerm("fang");
+        dict.addTerm("plan");
+        dict.addTerm("epsilon");
+        dict.addTerm("trachea");
+        dict.addTerm("ace");
+        dict.addTerm("acid");
+        dict.addTerm("accent");
+
+        // Test range smaller than min word length.
+        Collection<String> terms = dict.findAllTermsOfLength(0,0);
+        assertEquals(0, terms.size());
+        
+        // Test max lenght smaller than min lenght.  Should result in lenght of 3,3
+        terms = dict.findAllTermsOfLength(3,2);
+        assertEquals(1, terms.size());
+    }
 }

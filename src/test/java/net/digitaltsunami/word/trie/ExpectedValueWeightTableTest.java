@@ -11,7 +11,7 @@ public class ExpectedValueWeightTableTest {
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
         weightTable = new ExpectedValueWeightTable(
-                ClassLoader.getSystemResourceAsStream("letterFreq.csv"));
+                ExpectedValueWeightTableTest.class.getResourceAsStream("/letterFreq.csv"));
     }
 
     @Test
